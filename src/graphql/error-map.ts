@@ -371,6 +371,10 @@ export const mapError = (error: ApplicationError): CustomApolloError => {
     case "NonLnPaymentTransactionForPaymentFlowError":
     case "MissingPropsInTransactionForPaymentFlowError":
     case "InvalidZeroAmountPriceRatioInputError":
+    case "BigIntConversionError":
+    case "BigIntFloatConversionError":
+    case "UnknownBigIntConversionError":
+    case "SafeWrapperError":
       message = `Unknown error occurred (code: ${error.name}${
         error.message ? ": " + error.message : ""
       })`
