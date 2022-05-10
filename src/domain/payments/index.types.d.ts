@@ -16,7 +16,7 @@ type PaymentFlowState<S extends WalletCurrency, R extends WalletCurrency> = {
 
   btcPaymentAmount: BtcPaymentAmount
   usdPaymentAmount: UsdPaymentAmount
-  inputAmount: BigInt
+  inputAmount: bigint
 
   btcProtocolFee: BtcPaymentAmount
   usdProtocolFee: UsdPaymentAmount
@@ -33,7 +33,7 @@ type PaymentFlowState<S extends WalletCurrency, R extends WalletCurrency> = {
 type PaymentFlowStatePendingUpdate = {
   senderWalletId: WalletId
   paymentHash: PaymentHash
-  inputAmount: BigInt
+  inputAmount: bigint
 
   paymentSentAndPending: boolean
 }
@@ -146,7 +146,7 @@ interface IPaymentFlowRepository {
   }: {
     walletId: WalletId
     paymentHash: PaymentHash
-    inputAmount: BigInt
+    inputAmount: bigint
   }): Promise<PaymentFlow<S, WalletCurrency> | RepositoryError>
   updateLightningPaymentFlow<S extends WalletCurrency>(
     paymentFlow: PaymentFlow<S, WalletCurrency>,
@@ -176,7 +176,7 @@ type LPFBWithInvoiceState = LightningPaymentFlowBuilderConfig & {
   settlementMethod: SettlementMethod
   descriptionFromInvoice: string
   btcPaymentAmount?: BtcPaymentAmount
-  inputAmount?: BigInt
+  inputAmount?: bigint
   uncheckedAmount?: number
   btcProtocolFee?: BtcPaymentAmount
   usdProtocolFee?: UsdPaymentAmount
