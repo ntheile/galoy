@@ -1,3 +1,5 @@
+import { toSats } from "@domain/bitcoin"
+import { toCents } from "@domain/fiat"
 import {
   CouldNotFindLightningPaymentFlowError,
   CouldNotUpdateLightningPaymentFlowError,
@@ -5,7 +7,11 @@ import {
   UnknownRepositoryError,
 } from "@domain/errors"
 import { PaymentFlow } from "@domain/payments"
-import { WalletCurrency } from "@domain/shared"
+import {
+  paymentAmountFromCents,
+  paymentAmountFromSats,
+  WalletCurrency,
+} from "@domain/shared"
 import { elapsedSinceTimestamp } from "@utils"
 
 import { PaymentFlowState } from "./schema"
@@ -15,7 +21,7 @@ export const PaymentFlowStateRepository = (
 ): IPaymentFlowRepository => {
   const persistNew = async <S extends WalletCurrency, R extends WalletCurrency>(
     paymentFlow: PaymentFlow<S, R>,
-  ): Promise<PaymentFlow<S, R> | RepositoryError> => {
+  ): Promise<PaymentFlow<S, R> | RepositoryError | ValidationError> => {
     try {
       const rawPaymentFlowState = rawFromPaymentFlow(paymentFlow)
       const paymentFlowState = new PaymentFlowState(rawPaymentFlowState)
@@ -26,7 +32,7 @@ export const PaymentFlowStateRepository = (
     }
   }
 
-  const findLightningPaymentFlow = async <S extends WalletCurrency>({
+  const findLightningPaymentFlow = async ({
     walletId,
     paymentHash,
     inputAmount,
@@ -34,7 +40,9 @@ export const PaymentFlowStateRepository = (
     walletId: WalletId
     paymentHash: PaymentHash
     inputAmount: BigInt
-  }): Promise<PaymentFlow<S, WalletCurrency> | RepositoryError> => {
+  }): Promise<
+    PaymentFlow<WalletCurrency, WalletCurrency> | RepositoryError | ValidationError
+  > => {
     try {
       const result = await PaymentFlowState.findOne({
         senderWalletId: walletId,
@@ -43,7 +51,9 @@ export const PaymentFlowStateRepository = (
       })
       if (!result) return new CouldNotFindLightningPaymentFlowError()
 
-      const paymentFlow: PaymentFlow<S, WalletCurrency> = paymentFlowFromRaw(result)
+      const paymentFlow = paymentFlowFromRaw(result)
+      if (paymentFlow instanceof Error) return paymentFlow
+
       if (isExpired({ paymentFlow, expiryTimeInSeconds })) {
         deleteLightningPaymentFlow({ walletId, paymentHash, inputAmount })
         return new CouldNotFindLightningPaymentFlowError()
@@ -87,7 +97,7 @@ export const PaymentFlowStateRepository = (
     R extends WalletCurrency,
   >(
     paymentFlowPendingUpdate: PaymentFlowStatePendingUpdate,
-  ): Promise<PaymentFlow<S, R> | RepositoryError> => {
+  ): Promise<PaymentFlow<S, R> | RepositoryError | ValidationError> => {
     try {
       const result = await PaymentFlowState.findOneAndUpdate(
         {
@@ -164,8 +174,10 @@ export const PaymentFlowStateRepository = (
 
 const paymentFlowFromRaw = <S extends WalletCurrency, R extends WalletCurrency>(
   paymentFlowState: PaymentFlowStateRecord,
-): PaymentFlow<S, R> =>
-  PaymentFlow<S, R>({
+): PaymentFlow<S, R> | ValidationError => {
+  const inputAmount = BigInt(paymentFlowState.inputAmount)
+
+  return PaymentFlow<S, R>({
     senderWalletId: paymentFlowState.senderWalletId as WalletId,
     senderWalletCurrency: paymentFlowState.senderWalletCurrency as S,
     settlementMethod: paymentFlowState.settlementMethod as SettlementMethod,
@@ -176,24 +188,12 @@ const paymentFlowFromRaw = <S extends WalletCurrency, R extends WalletCurrency>(
     createdAt: paymentFlowState.createdAt,
     paymentSentAndPending: paymentFlowState.paymentSentAndPending,
 
-    btcPaymentAmount: {
-      currency: WalletCurrency.Btc,
-      amount: BigInt(paymentFlowState.btcPaymentAmount),
-    },
-    usdPaymentAmount: {
-      currency: WalletCurrency.Usd,
-      amount: BigInt(paymentFlowState.usdPaymentAmount),
-    },
-    inputAmount: BigInt(paymentFlowState.inputAmount),
+    btcPaymentAmount: paymentAmountFromSats(toSats(paymentFlowState.btcPaymentAmount)),
+    usdPaymentAmount: paymentAmountFromCents(toCents(paymentFlowState.usdPaymentAmount)),
+    inputAmount,
 
-    btcProtocolFee: {
-      currency: WalletCurrency.Btc,
-      amount: BigInt(paymentFlowState.btcProtocolFee),
-    },
-    usdProtocolFee: {
-      currency: WalletCurrency.Usd,
-      amount: BigInt(paymentFlowState.usdProtocolFee),
-    },
+    btcProtocolFee: paymentAmountFromSats(toSats(paymentFlowState.btcProtocolFee)),
+    usdProtocolFee: paymentAmountFromCents(toCents(paymentFlowState.usdProtocolFee)),
 
     recipientWalletId: (paymentFlowState.recipientWalletId as WalletId) || undefined,
     recipientWalletCurrency: (paymentFlowState.recipientWalletCurrency as R) || undefined,
@@ -203,6 +203,7 @@ const paymentFlowFromRaw = <S extends WalletCurrency, R extends WalletCurrency>(
     outgoingNodePubkey: (paymentFlowState.outgoingNodePubkey as Pubkey) || undefined,
     cachedRoute: paymentFlowState.cachedRoute,
   })
+}
 
 const rawFromPaymentFlow = <S extends WalletCurrency, R extends WalletCurrency>(
   paymentFlow: PaymentFlow<S, R>,

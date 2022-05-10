@@ -139,7 +139,7 @@ interface IPaymentFlowRepository {
   persistNew<S extends WalletCurrency>(
     payment: PaymentFlow<S, WalletCurrency>,
   ): Promise<PaymentFlow<S, WalletCurrency> | RepositoryError>
-  findLightningPaymentFlow<S extends WalletCurrency>({
+  findLightningPaymentFlow({
     walletId,
     paymentHash,
     inputAmount,
@@ -147,7 +147,7 @@ interface IPaymentFlowRepository {
     walletId: WalletId
     paymentHash: PaymentHash
     inputAmount: bigint
-  }): Promise<PaymentFlow<S, WalletCurrency> | RepositoryError>
+  }): Promise<PaymentFlow<WalletCurrency, WalletCurrency> | RepositoryError>
   updateLightningPaymentFlow<S extends WalletCurrency>(
     paymentFlow: PaymentFlow<S, WalletCurrency>,
   ): Promise<true | RepositoryError>
