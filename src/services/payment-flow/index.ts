@@ -179,6 +179,22 @@ const paymentFlowFromRaw = <S extends WalletCurrency, R extends WalletCurrency>(
   const inputAmount = safeBigInt(paymentFlowState.inputAmount)
   if (inputAmount instanceof Error) return inputAmount
 
+  const btcPaymentAmount = paymentAmountFromSats(
+    toSats(paymentFlowState.btcPaymentAmount),
+  )
+  if (btcPaymentAmount instanceof Error) return btcPaymentAmount
+
+  const usdPaymentAmount = paymentAmountFromCents(
+    toCents(paymentFlowState.usdPaymentAmount),
+  )
+  if (usdPaymentAmount instanceof Error) return usdPaymentAmount
+
+  const btcProtocolFee = paymentAmountFromSats(toSats(paymentFlowState.btcProtocolFee))
+  if (btcProtocolFee instanceof Error) return btcProtocolFee
+
+  const usdProtocolFee = paymentAmountFromCents(toCents(paymentFlowState.usdProtocolFee))
+  if (usdProtocolFee instanceof Error) return usdProtocolFee
+
   return PaymentFlow<S, R>({
     senderWalletId: paymentFlowState.senderWalletId as WalletId,
     senderWalletCurrency: paymentFlowState.senderWalletCurrency as S,
@@ -190,12 +206,12 @@ const paymentFlowFromRaw = <S extends WalletCurrency, R extends WalletCurrency>(
     createdAt: paymentFlowState.createdAt,
     paymentSentAndPending: paymentFlowState.paymentSentAndPending,
 
-    btcPaymentAmount: paymentAmountFromSats(toSats(paymentFlowState.btcPaymentAmount)),
-    usdPaymentAmount: paymentAmountFromCents(toCents(paymentFlowState.usdPaymentAmount)),
+    btcPaymentAmount,
+    usdPaymentAmount,
     inputAmount,
 
-    btcProtocolFee: paymentAmountFromSats(toSats(paymentFlowState.btcProtocolFee)),
-    usdProtocolFee: paymentAmountFromCents(toCents(paymentFlowState.usdProtocolFee)),
+    btcProtocolFee,
+    usdProtocolFee,
 
     recipientWalletId: (paymentFlowState.recipientWalletId as WalletId) || undefined,
     recipientWalletCurrency: (paymentFlowState.recipientWalletCurrency as R) || undefined,
