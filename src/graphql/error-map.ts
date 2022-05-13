@@ -297,6 +297,7 @@ export const mapError = (error: ApplicationError): CustomApolloError => {
     case "LockError":
     case "LockServiceError":
     case "ResourceAttemptsLockServiceError":
+    case "ResourceExpiredLockServiceError":
     case "UnknownLockServiceError":
     case "PriceError":
     case "PriceServiceError":
