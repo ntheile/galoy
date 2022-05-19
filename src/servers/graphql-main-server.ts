@@ -1,4 +1,11 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import * as fs from "fs"
+
 import dotenv from "dotenv"
+import { printSchema, parse, lexicographicSortSchema } from "graphql"
 import { applyMiddleware } from "graphql-middleware"
 import { shield } from "graphql-shield"
 
@@ -8,10 +15,17 @@ import { baseLogger } from "@services/logger"
 
 import { GALOY_API_PORT } from "@config"
 
+import { gql } from "apollo-server"
+import { buildSubgraphSchema } from "@apollo/subgraph"
+
+import { makeExecutableSchema } from "graphql-tools"
+import { mergeTypeDefs } from "@graphql-tools/merge"
+
 import { gqlMainSchema } from "../graphql"
 
 import { isAuthenticated, startApolloServer } from "./graphql-server"
 import { walletIdMiddleware } from "./middlewares/wallet-id"
+
 
 const graphqlLogger = baseLogger.child({ module: "graphql" })
 
@@ -59,9 +73,17 @@ export async function startApolloServerForCoreSchema() {
     { allowExternalErrors: true },
   )
 
-  const schema = applyMiddleware(gqlMainSchema, permissions, walletIdMiddleware)
+  // original schema
+  // const schema = applyMiddleware(gqlMainSchema, permissions, walletIdMiddleware);
+
+  //#region Apollo Federation
+  const schema = applyMiddleware(gqlMainSchema, permissions, walletIdMiddleware);
+  const federatedSchema = buildSubgraphSchema( parse(printSchema(lexicographicSortSchema(schema))) )
+  // const executableSchema = makeExecutableSchema({typeDefs: federatedSchema }); // gotta figure out how to get resolvers
+  //#endregion
+
   return startApolloServer({
-    schema,
+    schema: federatedSchema,
     port: GALOY_API_PORT,
     startSubscriptionServer: true,
     enableApolloUsageReporting: true,

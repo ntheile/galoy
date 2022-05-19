@@ -23,8 +23,19 @@ start-api-ci:
 	node lib/servers/graphql-main-server.js
 
 debug:
-	. ./.envrc && yarn tsnd --inspect=0.0.0.0:9230 --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts \
-		src/servers/graphql-main-server.ts | yarn pino-pretty -c -l
+	make debug-admin & make debug-main 
+
+debug-admin:
+	. ./.envrc && \
+	yarn tsnd --inspect=0.0.0.0:9231 --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts src/servers/graphql-admin-server.ts | yarn pino-pretty -c -l 
+
+debug-main:
+	. ./.envrc && \
+	yarn tsnd --inspect=0.0.0.0:9230 --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts src/servers/graphql-main-server.ts | yarn pino-pretty -c -l 
+
+gateway:
+	. ./.envrc && \
+	yarn tsnd --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts src/servers/gateway.ts | yarn pino-pretty -c -l 
 
 exporter: start-deps
 	. ./.envrc && yarn tsnd --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts \
