@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import * as fs from "fs"
+import { readFile } from "fs/promises"
 
 import dotenv from "dotenv"
-import { printSchema, parse, lexicographicSortSchema } from "graphql"
+import { parse } from "graphql"
 import { applyMiddleware } from "graphql-middleware"
 import { shield } from "graphql-shield"
 
@@ -15,17 +11,16 @@ import { baseLogger } from "@services/logger"
 
 import { GALOY_API_PORT } from "@config"
 
-import { gql } from "apollo-server"
 import { buildSubgraphSchema } from "@apollo/subgraph"
 
-import { makeExecutableSchema } from "graphql-tools"
-import { mergeTypeDefs } from "@graphql-tools/merge"
+import { makeExecutableSchema } from "@graphql-tools/schema"
+
+import { getResolversFromSchema } from "@graphql-tools/utils"
 
 import { gqlMainSchema } from "../graphql"
 
 import { isAuthenticated, startApolloServer } from "./graphql-server"
 import { walletIdMiddleware } from "./middlewares/wallet-id"
-
 
 const graphqlLogger = baseLogger.child({ module: "graphql" })
 
@@ -77,13 +72,18 @@ export async function startApolloServerForCoreSchema() {
   // const schema = applyMiddleware(gqlMainSchema, permissions, walletIdMiddleware);
 
   //#region Apollo Federation
-  const schema = applyMiddleware(gqlMainSchema, permissions, walletIdMiddleware);
-  const federatedSchema = buildSubgraphSchema( parse(printSchema(lexicographicSortSchema(schema))) )
-  // const executableSchema = makeExecutableSchema({typeDefs: federatedSchema }); // gotta figure out how to get resolvers
+  // https://www.apollographql.com/docs/federation/subgraphs/
+  // @todo - figure out how to get add the federation schema via Code-First objects and not SDL
+  const sdl = await readFile(`${__dirname}/../graphql/main/schema.graphql`, "utf-8")
+  const parsedSDL = parse(sdl)
+  const resolvers = getResolversFromSchema(gqlMainSchema)
+  const subgraphSchema = buildSubgraphSchema(parsedSDL)
+  const executableSchema = makeExecutableSchema({ typeDefs: subgraphSchema, resolvers })
+  const schema = applyMiddleware(executableSchema, permissions, walletIdMiddleware)
   //#endregion
 
   return startApolloServer({
-    schema: federatedSchema,
+    schema,
     port: GALOY_API_PORT,
     startSubscriptionServer: true,
     enableApolloUsageReporting: true,

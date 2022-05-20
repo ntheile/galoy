@@ -1,3 +1,7 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.0",
+        import: ["@key", "@shareable"])
+
 interface Account {
   csvTransactions(walletIds: [WalletId!]!): String!
   defaultWalletId: WalletId!
@@ -992,7 +996,7 @@ type UsdWallet implements Wallet {
   walletCurrency: WalletCurrency!
 }
 
-type User {
+type User @key(fields: "id") {
   """
   Get single contact details.
   Can include the transactions associated with the contact.

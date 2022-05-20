@@ -8,14 +8,15 @@ import QueryType from "./queries"
 import MutationType from "./mutations"
 import SubscriptionType from "./subscriptions"
 
-if (isDev && !isRunningJest) {
-  import("@services/fs").then(({ writeSDLFile }) => {
-    writeSDLFile(
-      __dirname + "/schema.graphql",
-      printSchema(lexicographicSortSchema(gqlMainSchema)),
-    )
-  })
-}
+// @todo - temporarily disabled until i can figure out code first scheme for federation directives
+// if (isDev && !isRunningJest) {
+//   import("@services/fs").then(({ writeSDLFile }) => {
+//     writeSDLFile(
+//       __dirname + "/schema.graphql",
+//       printSchema(lexicographicSortSchema(gqlMainSchema)),
+//     )
+//   })
+// }
 
 export const gqlMainSchema = new GraphQLSchema({
   query: QueryType,

@@ -1302,6 +1302,14 @@
     "@graphql-tools/utils" "8.6.9"
     tslib "~2.3.0"
 
+"@graphql-tools/merge@8.2.12":
+  version "8.2.12"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/merge/-/merge-8.2.12.tgz#6d2ae5a7cfca7241e8462d7f4d9cf0fb05acaec5"
+  integrity sha512-0b07QoAfINuuoJ59gupOBe5gWy+WVjEO9ZbbpPD98nuLn5aNxI12wj1SvQlACFE8cVAPiRxrO+03QjyXXPDu8A==
+  dependencies:
+    "@graphql-tools/utils" "8.6.11"
+    tslib "~2.4.0"
+
 "@graphql-tools/merge@^8.2.11":
   version "8.2.11"
   resolved "https://registry.yarnpkg.com/@graphql-tools/merge/-/merge-8.2.11.tgz#0cdc6c9feb32e3392bf0c633881a78ccc1d24368"
@@ -1320,7 +1328,7 @@
     fast-json-stable-stringify "^2.1.0"
     tslib "~2.3.0"
 
-"@graphql-tools/schema@8.3.10", "@graphql-tools/schema@^8.0.0", "@graphql-tools/schema@^8.3.1", "@graphql-tools/schema@^8.3.10":
+"@graphql-tools/schema@8.3.10", "@graphql-tools/schema@^8.0.0", "@graphql-tools/schema@^8.3.10":
   version "8.3.10"
   resolved "https://registry.yarnpkg.com/@graphql-tools/schema/-/schema-8.3.10.tgz#c3e373e6ad854f533fc7e55859dd8f9e81de30dd"
   integrity sha512-tfhjSTi3OzheDrVzG7rkPZg2BbQjmZRLM2vvQoM2b1TnUwgUIbpAgcnf+AWDLRsoCOWlezeLgij1BLeAR0Q0jg==
@@ -1330,10 +1338,27 @@
     tslib "~2.3.0"
     value-or-promise "1.0.11"
 
-"@graphql-tools/utils@8.6.10":
+"@graphql-tools/schema@^8.3.12":
+  version "8.3.12"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/schema/-/schema-8.3.12.tgz#5317147ac62b97355605622f70d4ddcee2bce973"
+  integrity sha512-X8tjAIhf7svAXAH1RRlm6J1mqG2YxCGYffp8RytbKobXqZDgj5VL50Lm5xSzvv/uzkFO4iNTpV5cm5nARN7odQ==
+  dependencies:
+    "@graphql-tools/merge" "8.2.12"
+    "@graphql-tools/utils" "8.6.11"
+    tslib "~2.4.0"
+    value-or-promise "1.0.11"
+
+"@graphql-tools/utils@8.6.10", "@graphql-tools/utils@^8.6.10":
   version "8.6.10"
   resolved "https://registry.yarnpkg.com/@graphql-tools/utils/-/utils-8.6.10.tgz#38e42a97a74ffcf5a21e816401e2ca1647194f6a"
   integrity sha512-bJH9qwuyM3BP0PTU6/lvBDkk6jdEIOn+dbyk4pHMVNnvbJ1gZQwo62To8SHxxaUTus8OMhhVPSh9ApWXREURcg==
+  dependencies:
+    tslib "~2.4.0"
+
+"@graphql-tools/utils@8.6.11":
+  version "8.6.11"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/utils/-/utils-8.6.11.tgz#2b9148082efedab361b9394c15544b0272d39217"
+  integrity sha512-Ebr2r9uzp+FwiH0oCKXrsi36ON9jNRGDN4krAhoJZgtM2iJredX2NaIJTtPIPwzqiizC0K2NdmI6VfTkGBPGjA==
   dependencies:
     tslib "~2.4.0"
 
