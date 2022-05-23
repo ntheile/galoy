@@ -36,7 +36,7 @@ debug-main:
 
 gateway:
 	. ./.envrc && \
-	yarn tsnd --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts src/servers/gateway.ts | yarn pino-pretty -c -l 
+	yarn tsnd --inspect=0.0.0.0:9250 --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts src/servers/gateway.ts | yarn pino-pretty -c -l 
 
 exporter: start-deps
 	. ./.envrc && yarn tsnd --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts \

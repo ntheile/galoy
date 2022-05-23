@@ -3,6 +3,8 @@ import { ApolloGateway, IntrospectAndCompose } from "@apollo/gateway"
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core"
 import express from "express"
 
+import { useForwardHeaders } from "./middlewares/useForwardHeaders"
+
 async function bootGateway() {
   const port = 4000
   const app = express()
@@ -16,11 +18,21 @@ async function bootGateway() {
         // ...additional subgraphs...
       ],
     }),
+    // https://www.apollographql.com/blog/backend/auth/setting-up-authentication-and-authorization-apollo-federation/
+    buildService({ url }) {
+      return new useForwardHeaders({ url })
+    },
   })
 
   const apolloServer = new ApolloServer({
     gateway,
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+    // forward headers
+    context: async ({ req }) => {
+      if (req.headers) {
+        return { headers: req.headers }
+      }
+    },
   })
 
   await apolloServer.start()
