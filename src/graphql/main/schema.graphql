@@ -1,41 +1,3 @@
-schema
-  @link(url: "https://specs.apollo.dev/link/v1.0")
-  @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable"]) {
-  query: Query
-  mutation: Mutation
-  subscription: Subscription
-}
-
-directive @federation__extends on INTERFACE | OBJECT
-
-directive @federation__external(reason: String) on FIELD_DEFINITION | OBJECT
-
-directive @federation__inaccessible on ARGUMENT_DEFINITION | ENUM | ENUM_VALUE | FIELD_DEFINITION | INPUT_FIELD_DEFINITION | INPUT_OBJECT | INTERFACE | OBJECT | SCALAR | UNION
-
-directive @federation__override(from: String!) on FIELD_DEFINITION
-
-directive @federation__provides(fields: federation__FieldSet!) on FIELD_DEFINITION
-
-directive @federation__requires(fields: federation__FieldSet!) on FIELD_DEFINITION
-
-directive @federation__tag(
-  name: String!
-) repeatable on ARGUMENT_DEFINITION | ENUM | ENUM_VALUE | FIELD_DEFINITION | INPUT_FIELD_DEFINITION | INPUT_OBJECT | INTERFACE | OBJECT | SCALAR | UNION
-
-directive @key(
-  fields: federation__FieldSet!
-  resolvable: Boolean = true
-) repeatable on INTERFACE | OBJECT
-
-directive @link(
-  as: String
-  for: link__Purpose
-  import: [link__Import]
-  url: String
-) repeatable on SCHEMA
-
-directive @shareable on FIELD_DEFINITION | OBJECT
-
 interface Account {
   csvTransactions(walletIds: [WalletId!]!): String!
   defaultWalletId: WalletId!
@@ -71,6 +33,7 @@ type BTCWallet implements Wallet {
   """
   balance: SignedAmount!
   id: ID!
+
   """
   A list of BTC transactions associated with this wallet.
   """
@@ -79,14 +42,17 @@ type BTCWallet implements Wallet {
     Returns the items in the list that come after the specified cursor.
     """
     after: String
+
     """
     Returns the items in the list that come before the specified cursor.
     """
     before: String
+
     """
     Returns the first n items from the list.
     """
     first: Int
+
     """
     Returns the last n items from the list.
     """
@@ -169,6 +135,7 @@ Provides global settings for the application which might have an impact for the 
 """
 type Globals {
   buildInformation: BuildInformation!
+
   """
   A list of public keys for the running lightning nodes.
   This can be used to know if an invoice belongs to one of our nodes.
@@ -214,11 +181,13 @@ input IntraLedgerPaymentSendInput {
   Amount in satoshis.
   """
   amount: SatAmount!
+
   """
   Optional memo to be attached to the payment.
   """
   memo: Memo
   recipientWalletId: WalletId!
+
   """
   The wallet ID of the sender.
   """
@@ -238,11 +207,13 @@ input IntraLedgerUsdPaymentSendInput {
   Amount in cents.
   """
   amount: CentAmount!
+
   """
   Optional memo to be attached to the payment.
   """
   memo: Memo
   recipientWalletId: WalletId!
+
   """
   The wallet ID of the sender.
   """
@@ -268,10 +239,12 @@ input LnInvoiceCreateInput {
   Amount in satoshis.
   """
   amount: SatAmount!
+
   """
   Optional memo for the lightning invoice.
   """
   memo: Memo
+
   """
   Wallet ID for a BTC wallet belonging to the current account.
   """
@@ -284,10 +257,12 @@ input LnInvoiceCreateOnBehalfOfRecipientInput {
   """
   amount: SatAmount!
   descriptionHash: Hex32Bytes
+
   """
   Optional memo for the lightning invoice.
   """
   memo: Memo
+
   """
   Wallet ID for a BTC wallet which belongs to any account.
   """
@@ -309,10 +284,12 @@ input LnInvoicePaymentInput {
   Optional memo to associate with the lightning invoice.
   """
   memo: Memo
+
   """
   Payment request representing the invoice which is being paid.
   """
   paymentRequest: LnPaymentRequest!
+
   """
   Wallet ID with sufficient balance to cover amount of invoice.  Must belong to the account of the current user.
   """
@@ -339,6 +316,7 @@ input LnNoAmountInvoiceCreateInput {
   Optional memo for the lightning invoice.
   """
   memo: Memo
+
   """
   ID for either a USD or BTC wallet belonging to the account of the current user.
   """
@@ -350,6 +328,7 @@ input LnNoAmountInvoiceCreateOnBehalfOfRecipientInput {
   Optional memo for the lightning invoice.
   """
   memo: Memo
+
   """
   ID for either a USD or BTC wallet which belongs to the account of any user.
   """
@@ -372,14 +351,17 @@ input LnNoAmountInvoicePaymentInput {
   Amount to pay in satoshis.
   """
   amount: SatAmount!
+
   """
   Optional memo to associate with the lightning invoice.
   """
   memo: Memo
+
   """
   Payment request representing the invoice which is being paid.
   """
   paymentRequest: LnPaymentRequest!
+
   """
   Wallet ID with sufficient balance to cover amount defined in mutation request.  Must belong to the account of the current user.
   """
@@ -397,14 +379,17 @@ input LnNoAmountUsdInvoicePaymentInput {
   Amount to pay in USD cents.
   """
   amount: CentAmount!
+
   """
   Optional memo to associate with the lightning invoice.
   """
   memo: Memo
+
   """
   Payment request representing the invoice which is being paid.
   """
   paymentRequest: LnPaymentRequest!
+
   """
   Wallet ID with sufficient balance to cover amount defined in mutation request.  Must belong to the account of the current user.
   """
@@ -431,10 +416,12 @@ input LnUsdInvoiceCreateInput {
   Amount in USD cents.
   """
   amount: CentAmount!
+
   """
   Optional memo for the lightning invoice.
   """
   memo: Memo
+
   """
   Wallet ID for a USD wallet belonging to the current user.
   """
@@ -447,10 +434,12 @@ input LnUsdInvoiceCreateOnBehalfOfRecipientInput {
   """
   amount: CentAmount!
   descriptionHash: Hex32Bytes
+
   """
   Optional memo for the lightning invoice. Acts as a note to the recipient.
   """
   memo: Memo
+
   """
   Wallet ID for a USD wallet which belongs to the account of any user.
   """
@@ -492,24 +481,28 @@ type Mutation {
   deviceNotificationTokenCreate(
     input: DeviceNotificationTokenCreateInput!
   ): SuccessPayload!
+
   """
   Actions a payment which is internal to the ledger e.g. it does
   not use onchain/lightning. Returns payment status (success,
   failed, pending, already_paid).
   """
   intraLedgerPaymentSend(input: IntraLedgerPaymentSendInput!): PaymentSendPayload!
+
   """
   Actions a payment which is internal to the ledger e.g. it does
   not use onchain/lightning. Returns payment status (success,
   failed, pending, already_paid).
   """
   intraLedgerUsdPaymentSend(input: IntraLedgerUsdPaymentSendInput!): PaymentSendPayload!
+
   """
   Returns a lightning invoice for an associated wallet.
   When invoice is paid the value will be credited to a BTC wallet.
   Expires after 24 hours.
   """
   lnInvoiceCreate(input: LnInvoiceCreateInput!): LnInvoicePayload!
+
   """
   Returns a lightning invoice for an associated wallet.
   When invoice is paid the value will be credited to a BTC wallet.
@@ -519,18 +512,21 @@ type Mutation {
     input: LnInvoiceCreateOnBehalfOfRecipientInput!
   ): LnInvoicePayload!
   lnInvoiceFeeProbe(input: LnInvoiceFeeProbeInput!): SatAmountPayload!
+
   """
   Pay a lightning invoice using a balance from a wallet which is owned by the account of the current user.
   Provided wallet can be USD or BTC and must have sufficient balance to cover amount in lightning invoice.
   Returns payment status (success, failed, pending, already_paid).
   """
   lnInvoicePaymentSend(input: LnInvoicePaymentInput!): PaymentSendPayload!
+
   """
   Returns a lightning invoice for an associated wallet.
   Can be used to receive any supported currency value (currently USD or BTC).
   Expires after 24 hours.
   """
   lnNoAmountInvoiceCreate(input: LnNoAmountInvoiceCreateInput!): LnNoAmountInvoicePayload!
+
   """
   Returns a lightning invoice for an associated wallet.
   Can be used to receive any supported currency value (currently USD or BTC).
@@ -540,6 +536,7 @@ type Mutation {
     input: LnNoAmountInvoiceCreateOnBehalfOfRecipientInput!
   ): LnNoAmountInvoicePayload!
   lnNoAmountInvoiceFeeProbe(input: LnNoAmountInvoiceFeeProbeInput!): SatAmountPayload!
+
   """
   Pay a lightning invoice using a balance from a wallet which is owned by the account of the current user.
   Provided wallet must be BTC and must have sufficient balance to cover amount specified in mutation request.
@@ -549,6 +546,7 @@ type Mutation {
   lnNoAmountUsdInvoiceFeeProbe(
     input: LnNoAmountUsdInvoiceFeeProbeInput!
   ): CentAmountPayload!
+
   """
   Pay a lightning invoice using a balance from a wallet which is owned by the account of the current user.
   Provided wallet must be USD and have sufficient balance to cover amount specified in mutation request.
@@ -557,6 +555,7 @@ type Mutation {
   lnNoAmountUsdInvoicePaymentSend(
     input: LnNoAmountUsdInvoicePaymentInput!
   ): PaymentSendPayload!
+
   """
   Returns a lightning invoice denominated in satoshis for an associated wallet.
   When invoice is paid the equivalent value at invoice creation will be credited to a USD wallet.
@@ -564,6 +563,7 @@ type Mutation {
   associated with the amount).
   """
   lnUsdInvoiceCreate(input: LnUsdInvoiceCreateInput!): LnInvoicePayload!
+
   """
   Returns a lightning invoice denominated in satoshis for an associated wallet.
   When invoice is paid the equivalent value at invoice creation will be credited to a USD wallet.
@@ -664,14 +664,17 @@ type PageInfo {
   When paginating forwards, the cursor to continue.
   """
   endCursor: String
+
   """
   When paginating forwards, are there more items?
   """
   hasNextPage: Boolean!
+
   """
   When paginating backwards, are there more items?
   """
   hasPreviousPage: Boolean!
+
   """
   When paginating backwards, the cursor to continue.
   """
@@ -746,6 +749,7 @@ type PricePayload {
 
 type PricePoint {
   price: Price!
+
   """
   Unix timestamp (number of seconds elapsed since January 1, 1970 00:00:00 UTC)
   """
@@ -761,7 +765,6 @@ type PublicWallet {
 }
 
 type Query {
-  _service: _Service!
   accountDefaultWallet(username: Username!, walletCurrency: WalletCurrency): PublicWallet!
   btcPrice: Price
   btcPriceList(range: PriceGraphRange!): [PricePoint]
@@ -865,20 +868,24 @@ type Transaction {
   createdAt: Timestamp!
   direction: TxDirection!
   id: ID!
+
   """
   From which protocol the payment has been initiated.
   """
   initiationVia: InitiationVia!
   memo: Memo
+
   """
   Amount of sats sent or received.
   """
   settlementAmount: SatAmount!
   settlementFee: SatAmount!
+
   """
   Price in USDCENT/SATS at time of settlement.
   """
   settlementPrice: Price!
+
   """
   To which protocol the payment has settled on.
   """
@@ -894,6 +901,7 @@ type TransactionConnection {
   A list of edges.
   """
   edges: [TransactionEdge!]
+
   """
   Information to aid in pagination.
   """
@@ -908,6 +916,7 @@ type TransactionEdge {
   A cursor for use in pagination
   """
   cursor: String!
+
   """
   The item at the end of the edge
   """
@@ -964,14 +973,17 @@ type UsdWallet implements Wallet {
     Returns the items in the list that come after the specified cursor.
     """
     after: String
+
     """
     Returns the items in the list that come before the specified cursor.
     """
     before: String
+
     """
     Returns the first n items from the list.
     """
     first: Int
+
     """
     Returns the last n items from the list.
     """
@@ -980,13 +992,14 @@ type UsdWallet implements Wallet {
   walletCurrency: WalletCurrency!
 }
 
-type User @key(fields: "id") {
+type User {
   """
   Get single contact details.
   Can include the transactions associated with the contact.
   """
   contactByUsername(username: Username!): UserContact!
     @deprecated(reason: "will be moved to Accounts")
+
   """
   Get full list of contacts.
   Can include the transactions associated with each contact.
@@ -995,20 +1008,24 @@ type User @key(fields: "id") {
   createdAt: Timestamp!
   defaultAccount: Account!
   id: ID!
+
   """
   Preferred language for user.
   When value is 'default' the intent is to use preferred language from OS settings.
   """
   language: Language!
+
   """
   Phone number with international calling code.
   """
   phone: Phone
+
   """
   List the quiz questions the user may have completed.
   """
   quizQuestions: [UserQuizQuestion!]! @deprecated(reason: "will be moved to Accounts")
   twoFAEnabled: Boolean
+
   """
   Optional immutable user friendly identifier.
   """
@@ -1022,6 +1039,7 @@ type UserContact {
   """
   alias: ContactAlias
   id: Username!
+
   """
   Paginated list of transactions sent to/from this contact.
   """
@@ -1030,20 +1048,24 @@ type UserContact {
     Returns the items in the list that come after the specified cursor.
     """
     after: String
+
     """
     Returns the items in the list that come before the specified cursor.
     """
     before: String
+
     """
     Returns the first n items from the list.
     """
     first: Int
+
     """
     Returns the last n items from the list.
     """
     last: Int
   ): TransactionConnection
   transactionsCount: Int!
+
   """
   Actual identifier of the contact.
   """
@@ -1114,6 +1136,7 @@ A generic wallet which stores value in one of our supported currencies.
 interface Wallet {
   balance: SignedAmount!
   id: ID!
+
   """
   Transactions are ordered anti-chronologically,
   ie: the newest transaction will be first
@@ -1123,14 +1146,17 @@ interface Wallet {
     Returns the items in the list that come after the specified cursor.
     """
     after: String
+
     """
     Returns the items in the list that come before the specified cursor.
     """
     before: String
+
     """
     Returns the first n items from the list.
     """
     first: Int
+
     """
     Returns the last n items from the list.
     """
@@ -1148,24 +1174,3 @@ enum WalletCurrency {
 Unique identifier of a wallet
 """
 scalar WalletId
-
-scalar _Any
-
-type _Service {
-  sdl: String
-}
-
-scalar federation__FieldSet
-
-scalar link__Import
-
-enum link__Purpose {
-  """
-  `EXECUTION` features provide metadata necessary for operation execution.
-  """
-  EXECUTION
-  """
-  `SECURITY` features provide metadata necessary to securely resolve fields.
-  """
-  SECURITY
-}

@@ -1,6 +1,7 @@
-/* eslint-disable prettier/prettier */
+import { readFileSync } from "fs"
+
 import dotenv from "dotenv"
-//import { applyMiddleware } from "graphql-middleware"
+
 import { shield } from "graphql-shield"
 
 import { setupMongoConnection } from "@services/mongodb"
@@ -22,38 +23,18 @@ const graphqlLogger = baseLogger.child({ module: "graphql" })
 dotenv.config()
 
 export async function startApolloServerForCoreSchema() {
-  
   // original schema
   // const schema = applyMiddleware(gqlMainSchema, permissions, walletIdMiddleware);
 
-  const schema = buildFederationSchema(gqlMainSchema, permissions, walletIdMiddleware, `
-    extend type User @key(fields: "id") 
-  `);
-
-  //#region Apollo Federation
-  // https://www.apollographql.com/docs/federation/subgraphs/
-  // @todo - figure out how to get add the federation schema via Code-First objects and not SDL
-  // const sdl = await readFile(`${__dirname}/../graphql/main/schema.graphql`, "utf-8")
-  // let schemaString = printSchemaWithDirectives(lexicographicSortSchema(gqlMainSchema))
-  // schemaString = `
-  //   extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable"])
-
-  // ` + schemaString;
-  // const parsedSDL = parse(schemaString)
-  // const resolvers = getResolversFromSchema(gqlMainSchema)
-  // const subgraphSchema = buildSubgraphSchema(parsedSDL)
-  // const executableSchema = makeExecutableSchema({ typeDefs: subgraphSchema, resolvers })
-  // let schema = applyMiddleware(executableSchema, permissions, walletIdMiddleware)
-  // schema = extendSchema(schema, parse(`
-  //   extend type User @key(fields: "id") 
-  // `));
-  // import("@services/fs").then(({ writeSDLFile }) => {
-  //   writeSDLFile(
-  //     __dirname + "/schema.graphql",
-  //     printSchemaWithDirectives(lexicographicSortSchema(schema)),
-  //   )
-  // })
-  //#endregion
+  const federationExtendTypes = readFileSync(
+    `${__dirname}/../graphql/federation/federation.graphql`,
+  ).toString("utf-8")
+  const schema = buildFederationSchema(
+    gqlMainSchema,
+    permissions,
+    walletIdMiddleware,
+    federationExtendTypes,
+  )
 
   return startApolloServer({
     schema,

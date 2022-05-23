@@ -35,8 +35,9 @@ debug-main:
 	yarn tsnd --inspect=0.0.0.0:9241 --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts src/servers/graphql-main-server.ts | yarn pino-pretty -c -l 
 
 gateway:
-	. ./.envrc && \
-	yarn tsnd --inspect=0.0.0.0:9250 --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts src/servers/gateway.ts | yarn pino-pretty -c -l 
+	chmod +x ./src/graphql/federation/gen-supergraphSDL.sh && \
+	./src/graphql/federation/gen-supergraphSDL.sh && \
+	yarn tsnd --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts src/servers/gateway.ts | yarn pino-pretty -c -l 
 
 exporter: start-deps
 	. ./.envrc && yarn tsnd --respawn --files -r tsconfig-paths/register -r src/services/tracing.ts \

@@ -1,0 +1,11 @@
+# https://www.apollographql.com/docs/federation/quickstart/local-composition
+federation_version: 2
+subgraphs:
+  galoy:
+    routing_url: http://localhost:4002/graphql
+    schema:
+      subgraph_url: http://localhost:4002/graphql
+  mechants:
+    routing_url: http://localhost:4003/graphql
+    schema:
+      subgraph_url: http://localhost:4003/graphql
