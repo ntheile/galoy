@@ -7,16 +7,22 @@ import express from "express"
 
 import { isDev, isRunningJest } from "@config"
 
+// eslint-disable-next-line import/no-deprecated
 import { useForwardHeaders } from "./middlewares/useForwardHeaders"
 
-// https://www.apollographql.com/docs/federation/gateway
+/**
+ *
+ * Boots the gateway for the Supergraph using Apollo Federation
+ * and loads the subgraphs
+ * @link https://www.apollographql.com/docs/federation/gateway
+ */
 async function bootGateway() {
   const port = 4000
   const app = express()
   let gateway
 
   if (isDev && !isRunningJest) {
-    // load schema via introspection
+    // load schema via introspection, only in dev
     gateway = new ApolloGateway({
       supergraphSdl: new IntrospectAndCompose({
         subgraphs: [
@@ -30,9 +36,10 @@ async function bootGateway() {
       },
     })
   } else {
-    // load schema via static SDL
+    // load schema via static SDL for prod
+    // supergraph.graphql is generated via gen-supergraphSDL.sh
     const supergraphSdl = readFileSync(
-      `${__dirname}/../graphql/federation/supergraph.graphql`, // supergraph.graphql is generated via gen-supergraphSDL.sh
+      `${__dirname}/../graphql/federation/supergraph.graphql`,
     ).toString()
     gateway = new ApolloGateway({
       supergraphSdl,

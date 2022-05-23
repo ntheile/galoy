@@ -7,10 +7,23 @@ import { getResolversFromSchema } from "@graphql-tools/utils"
 import { applyMiddleware } from "graphql-middleware"
 import { gqlMainSchema } from "@graphql/main"
 
-// https://www.apollographql.com/docs/enterprise-guide/federated-schema-design/
-// `
-//   extend type User @key(fields: "id")
-// `
+/**
+ * Builds the GraphQLSchema by extending it with the
+ * fedederation.graphql for Apollo Federation. It also applies the middleware
+ * @example const schema = buildFederationSchema(
+      gqlMainSchema,
+      permissions,
+      walletIdMiddleware,
+      federationExtendTypes,
+  )
+ * @param schemaInput
+ * @param permissions
+ * @param walletIdMiddleware
+ * @param federationExtendTypes see https://www.apollographql.com/docs/enterprise-guide/federated-schema-design/
+ *   @example extend type User @key(fields: "id") 
+ *   
+ * @returns GraphQLSchemaWithFragmentReplacements
+ */
 export function buildFederationSchema(
   schemaInput,
   permissions,
@@ -34,7 +47,13 @@ export function buildFederationSchema(
   return schema
 }
 
-// const schema = buildFederatedSchemaFromFile(`${__dirname}/../graphql/main/schema.graphql`, permissions, walletIdMiddleware);
+/**
+ * @example const schema = buildFederatedSchemaFromFile(`${__dirname}/../graphql/main/schema.graphql`, permissions, walletIdMiddleware);
+ * @param file
+ * @param permissions
+ * @param walletIdMiddleware
+ * @returns GraphQLSchemaWithFragmentReplacements
+ */
 export function buildFederatedSchemaFromFile(file, permissions, walletIdMiddleware) {
   const typeDefs = parse(readFileSync(file).toString("utf-8"))
   const resolvers = getResolversFromSchema(gqlMainSchema)
@@ -44,6 +63,11 @@ export function buildFederatedSchemaFromFile(file, permissions, walletIdMiddlewa
   return schema
 }
 
+/**
+ * Optional helper function to extend the schema.graphql with
+ * fedederation.graphql and write the file to main/schema.graphql
+ * @param federatedSchema
+ */
 export function writeFederationSchemaToFile(federatedSchema) {
   import("@services/fs").then(({ writeSDLFile }) => {
     const federationExtendTypes = readFileSync(

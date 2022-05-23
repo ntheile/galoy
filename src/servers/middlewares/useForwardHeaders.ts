@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable prettier/prettier */
 import { RemoteGraphQLDataSource } from "@apollo/gateway"
 
 /**
@@ -8,15 +6,15 @@ import { RemoteGraphQLDataSource } from "@apollo/gateway"
  */
 export class useForwardHeaders extends RemoteGraphQLDataSource {
   willSendRequest({ request, context }) {
-    const headers = context.headers;
-    if (!headers){
-        return;
+    const headers = context.headers
+    if (!headers) {
+      return
     }
     for (const key in headers) {
-        const value = headers[key];
-        if (value) {
-            request.http?.headers.set(key, String(value));
-        }
+      const value = headers[key]
+      if (value) {
+        request.http?.headers.set(key, String(value))
+      }
     }
   }
 }
