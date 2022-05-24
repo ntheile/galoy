@@ -546,6 +546,8 @@ type Merchant
   name: String
   address: String
   acceptsBitcoin: Boolean
+  latitude: Float
+  longitude: Float
 }
 
 type MobileVersions
