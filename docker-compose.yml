@@ -75,6 +75,39 @@ services:
     - ${PWD}/dev/lnd/tls.key:/root/.lnd/tls.key
     - ${PWD}/dev/lnd/tls.cert:/root/.lnd/tls.cert
     depends_on: [bitcoind]
+  loopserver:
+    image: lightninglabs/loopserver:v0.9.49-beta
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/dev/lnd/lnd.conf:/root/.lnd/lnd.conf
+      - ${PWD}/dev/lnd/tls.key:/root/.lnd/tls.key
+      - ${PWD}/dev/lnd/tls.cert:/root/.lnd/tls.cert
+      - ${PWD}/dev/lnd/macaroons/lnd1:/root/.lnd/data/chain/bitcoin/regtest
+    depends_on: [lnd1]
+    command:
+      - "daemon"
+      - "--maxamt=5000000"
+      - "--lnd.host=lnd1:10009"
+      - "--lnd.macaroondir=/root/.lnd/data/chain/bitcoin/regtest"
+      - "--lnd.tlspath=/root/.lnd/tls.cert"
+  loopclient:
+    image: loop:latest
+    restart: unless-stopped
+    volumes:
+      #- ${PWD}/dev/lnd/lnd.conf:/root/.lnd/lnd.conf
+      - ${PWD}/dev/lnd/tls.key:/root/.lnd/tls.key
+      - ${PWD}/dev/lnd/tls.cert:/root/.lnd/tls.cert
+      - ${PWD}/dev/lnd/macaroons/lnd2:/root/.lnd/data/chain/bitcoin/regtest
+    depends_on: [lnd1, loopserver]
+    command:
+      - "loopd"
+      - "--network=regtest"
+      - "--debuglevel=debug"
+      - "--server.host=loopserver:11009"
+      - "--server.notls"
+      - "--lnd.host=lnd2:10010"
+      - "--lnd.macaroonpath=/root/.lnd/data/chain/bitcoin/regtest/admin.macaroon"
+      - "--lnd.tlspath=/root/.lnd/tls.cert"
   e2e-tests:
     image: us.gcr.io/galoy-org/galoy-app-pipeline
     depends_on:

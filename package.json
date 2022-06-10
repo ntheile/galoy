@@ -19,7 +19,10 @@
     "test:unit": ". ./.envrc && LOGLEVEL=warn jest --config ./test/jest-unit.config.js --bail --verbose $TEST | yarn pino-pretty -c -l",
     "test:integration": ". ./.envrc && LOGLEVEL=warn jest --config ./test/jest-integration.config.js --bail --runInBand --verbose $TEST | yarn pino-pretty -c -l",
     "test:e2e": ". ./.envrc && LOGLEVEL=warn jest --config ./test/jest-e2e.config.js --bail --runInBand --verbose $TEST | yarn pino-pretty -c -l",
-    "build-docs": "npx spectaql spectaql-config.yml -1"
+    "build-docs": "npx spectaql spectaql-config.yml -1",
+    "rebal": ". ./.envrc && LOGLEVEL=warn jest --config ./test/jest-integration.config.js --bail --runInBand --verbose $TEST -i ./test/integration/app/cold-storage/rebalance-to-cold-wallet.spec.ts | yarn pino-pretty -c -l",
+    "loopout": "cd ./src/services/loop && tsnd loop-out.ts",
+    "startloop": "cd ./src/services/loop && ./start-loop.sh"
   },
   "engines": {
     "node": "16"

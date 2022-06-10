@@ -31,3 +31,11 @@ services:
   lnd-outside-2:
     ports:
       - "10013:10009"
+  loopserver:
+    ports:
+      - "11009:11009"
+  loopclient:
+    ports:
+      - "11010:11010"
+      - "8081:8081"
+
