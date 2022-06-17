@@ -4,7 +4,6 @@
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 
-
 export function loopOut() {
     const loaderOptions = {
         keepCase: true,
@@ -54,25 +53,3 @@ export function loopOut() {
 }
 
 loopOut();
-
-// (1) start loop server
-// (2) start loop client
-./src/services/loop/loopd \
-    --network=regtest \
-    --debuglevel=debug \
-    --server.host=localhost:11009 \
-    --server.notls \
-    --lnd.host=localhost:10010 \
-    --lnd.macaroonpath=./dev/lnd/macaroons/lnd2/admin.macaroon \
-    --lnd.tlspath=./dev/lnd/tls.cert
-// (3) mine blocks 
-// docker exec -it galoy-bitcoind-1 /bin/sh 
-// bitcoin-cli getnewaddress
-// bitcoin-cli generatetoaddress 25 bcrt1qfvpwr40putzmda7df8j322gk6gffvwcrn0ksa9end9cql5nggurqv62xnd
-// bitcoin-cli getblockcount
-// (4) now you can loop out
-// curl -X POST http://localhost:8081/v1/loop/out -d '{ \
-//     "amt":"5000000", \
-//     "max_swap_routing_fee":"20000" \
-// }'
-// (5) now monitor status
